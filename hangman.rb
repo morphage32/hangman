@@ -1,13 +1,15 @@
 class Puzzle
+  attr_reader :strikes
 
   def initialize()
     wordlist = File.open("google-10000-english-no-swears.txt", "r")
-    random_line = rand(1..10000)
+    @seed = rand(1..10000)
     @previous_letters = []
+    @strikes = 0
     line_number = 1
     
     wordlist.each do |line|
-      if line_number == random_line
+      if line_number == @seed
         @secret_word = line.chomp
         break
       end
@@ -35,6 +37,10 @@ class Puzzle
 
     return correct
 
+  end
+
+  def add_strike()
+    @strikes += 1
   end
 
   def show_letters()
@@ -83,7 +89,7 @@ class Hangman
   def initialize()
     @hangman_grid = []
     @hangman_grid[0] = [" "," "," "," "," ","-","-","-","-","-","-","-","-",
-    "-","-","-","-"]
+    "-","-","-","+"]
     @hangman_grid[1] = [" "," "," "," ", " ", "|"," "," "," "," "," "," "," ",
     " "," "," ","|"]
     i = 2
@@ -130,10 +136,9 @@ end
 def main_game()
   current_puzzle = Puzzle.new()
   guy = Hangman.new()
-  strikes = 0
   victory = false
 
-  while strikes < 6 && victory == false do
+  while current_puzzle.strikes < 6 && victory == false do
     guy.show_hangman
     puts
     current_puzzle.show_previous
@@ -142,21 +147,21 @@ def main_game()
     player_guess = ""
 
     until player_guess.length == 1 &&
-          (player_guess.ord > 96 && player_guess.ord < 123) do
-            puts "\n\nGuess a letter: "
-            player_guess = gets.downcase.chomp
-            if current_puzzle.check_previous(player_guess) == true
-              puts "Sorry, '#{player_guess}' has already been guessed. Try again."
-              player_guess = ""
-            end
+      (player_guess.ord > 96 && player_guess.ord < 123) do
+        puts "\n\nGuess a letter: "
+        player_guess = gets.downcase.chomp
+        if current_puzzle.check_previous(player_guess) == true
+          puts "Sorry, '#{player_guess}' has already been guessed. Try again."
+          player_guess = ""
+        end
     end
 
     current_puzzle.add_previous(player_guess)
 
     if current_puzzle.check_guess(player_guess) == 0
       puts "\nWRONG!"
-      strikes += 1
-      guy.add_strike(strikes)
+      current_puzzle.add_strike
+      guy.add_strike(current_puzzle.strikes)
     else
       puts "\nCORRECT!"
     end
