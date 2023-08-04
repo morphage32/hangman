@@ -3,6 +3,7 @@ class Puzzle
   def initialize()
     wordlist = File.open("google-10000-english-no-swears.txt", "r")
     random_line = rand(1..10000)
+    @previous_letters = []
     line_number = 1
     
     wordlist.each do |line|
@@ -40,6 +41,26 @@ class Puzzle
     @puzzle_letters.each do |slot|
       print slot + " "
     end
+  end
+
+  def add_previous(letter)
+    @previous_letters.push(letter)
+  end
+
+  def show_previous()
+    print "Wrong letters: "
+    @previous_letters.each do |letter|
+      unless @secret_word.include?(letter)
+        print letter + " "
+      end
+    end
+  end
+
+  def check_previous(letter)
+    if @previous_letters.include?(letter)
+      return true
+    end
+    return false
   end
 
   def endgame_check()
@@ -114,6 +135,9 @@ def main_game()
 
   while strikes < 6 && victory == false do
     guy.show_hangman
+    puts
+    current_puzzle.show_previous
+    puts "\n\n"
     current_puzzle.show_letters
     player_guess = ""
 
@@ -121,7 +145,13 @@ def main_game()
           (player_guess.ord > 96 && player_guess.ord < 123) do
             puts "\n\nGuess a letter: "
             player_guess = gets.downcase.chomp
+            if current_puzzle.check_previous(player_guess) == true
+              puts "Sorry, '#{player_guess}' has already been guessed. Try again."
+              player_guess = ""
+            end
     end
+
+    current_puzzle.add_previous(player_guess)
 
     if current_puzzle.check_guess(player_guess) == 0
       puts "\nWRONG!"
