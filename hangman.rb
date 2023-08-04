@@ -13,6 +13,7 @@ class Puzzle
       line_number += 1
     end
 
+    wordlist.close
     @puzzle_letters = Array.new(@secret_word.length, "_")
 
   end
@@ -56,12 +57,63 @@ class Puzzle
 
 end
 
+class Hangman
+
+  def initialize()
+    @hangman_grid = []
+    @hangman_grid[0] = [" "," "," "," "," ","-","-","-","-","-","-","-","-",
+    "-","-","-","-"]
+    @hangman_grid[1] = [" "," "," "," ", " ", "|"," "," "," "," "," "," "," ",
+    " "," "," ","|"]
+    i = 2
+    while i < 7 do
+      @hangman_grid[i] = [" "," "," "," "," "," "," "," "," "," "," "," "," "," ",
+      " "," ","|"]
+      i += 1
+    end
+    @hangman_grid[7] = [" "," "," "," "," "," "," "," "," "," "," "," "," "," ",
+    " ","/","|","\\"]
+    @hangman_grid[8] = Array.new(26, "-")
+  end
+
+  def show_hangman()
+    i = 0
+    @hangman_grid.length.times do
+      puts @hangman_grid[i].join
+      i += 1
+    end
+  end
+
+  def add_strike(strike_number)
+    case strike_number
+    when 1
+      @hangman_grid[2][5] = "O"
+    when 2
+      @hangman_grid[3][5] = "|"
+      @hangman_grid[4][5] = "|"
+    when 3
+      @hangman_grid[5][4] = "/"
+    when 4
+      @hangman_grid[5][6] = "\\"
+    when 5
+      @hangman_grid[3][3] = "-"
+      @hangman_grid[3][4] = "-"
+    when 6
+      @hangman_grid[3][6] = "-"
+      @hangman_grid[3][7] = "-"
+    end
+  end
+
+end
+
 def main_game()
   current_puzzle = Puzzle.new()
+  guy = Hangman.new()
   strikes = 0
   victory = false
 
   while strikes < 6 && victory == false do
+    guy.show_hangman
     current_puzzle.show_letters
     player_guess = ""
 
@@ -74,6 +126,7 @@ def main_game()
     if current_puzzle.check_guess(player_guess) == 0
       puts "\nWRONG!"
       strikes += 1
+      guy.add_strike(strikes)
     else
       puts "\nCORRECT!"
     end
@@ -88,6 +141,7 @@ def main_game()
     puts "GAME OVER! :("
   end
 
+  guy.show_hangman
   current_puzzle.show_secret_word
 
 end
