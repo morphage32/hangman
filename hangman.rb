@@ -31,16 +31,16 @@ class Puzzle
         @puzzle_letters[index] = guess_letter
       end
 
-    index += 1
+      index += 1
 
+    end
+
+    if correct == 0
+      @strikes += 1
     end
 
     return correct
 
-  end
-
-  def add_strike()
-    @strikes += 1
   end
 
   def show_letters()
@@ -160,7 +160,6 @@ def main_game()
 
     if current_puzzle.check_guess(player_guess) == 0
       puts "\nWRONG!"
-      current_puzzle.add_strike
       guy.add_strike(current_puzzle.strikes)
     else
       puts "\nCORRECT!"
